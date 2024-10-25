@@ -1,5 +1,6 @@
 package com.yash.MovieRoger.repository;
 
+import com.yash.MovieRoger.model.Movie;
 import com.yash.MovieRoger.model.Show;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,7 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
 
     @Query(value= "select s.* from shows s, theaters t where s.theater_id=t.id and t.city=?",nativeQuery = true)
     List<Show> findByCity(String cityName);
+
+    @Query(value = "select * from shows where theater_id in (select id from theaters where name = lcase(?))", nativeQuery = true)
+    List<Show> getShowByTheater(String theater);
 }

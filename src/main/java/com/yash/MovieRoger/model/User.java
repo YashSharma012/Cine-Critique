@@ -3,6 +3,9 @@ package com.yash.MovieRoger.model;
 import com.yash.MovieRoger.dto.UserDTO;
 import com.yash.MovieRoger.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +13,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,22 +24,29 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 @Data
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "mobile"),
+        @UniqueConstraint(columnNames = "email")
+})
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "name", nullable = false)
-    private String name;
+    private String username;
 
     @Column(name="password",nullable = false)
     private String password;
 
+    @NotNull
     @Column(name = "mobile", nullable = false)
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Phone number should be between 10 to 15 digits and can start with '+'")
     private String mobile;
 
+    @NotNull
     @Column(name = "email", nullable = false)
+    @Email(message = "Email should be valid")
     private String email;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -49,7 +58,7 @@ public class User implements UserDetails {
 
     public static User toEntity(UserDTO userDTO) {
         return User.builder()
-                .name(userDTO.getUsername())
+                .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
                 .email(userDTO.getEmail())
                 .mobile(userDTO.getMobile())
@@ -63,6 +72,7 @@ public class User implements UserDetails {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .mobile(user.getMobile())
+                .role(user.getRole())
                 .tickets(Ticket.toResource(user.getTicketEntities()))
                 .build();
     }
@@ -76,7 +86,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return username;
     }
 
     @Override

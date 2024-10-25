@@ -20,8 +20,8 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.bookTicket(bookingDTO));
     }
 
-    @GetMapping("/{ID}")
-    public ResponseEntity<TicketDTO> getTicket(@PathVariable(name = "id") long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<TicketDTO> getTicket(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(ticketService.getTicket(id));
     }
 }

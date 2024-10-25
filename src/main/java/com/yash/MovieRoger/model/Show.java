@@ -2,10 +2,6 @@ package com.yash.MovieRoger.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.yash.MovieRoger.dto.ShowDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -28,14 +25,17 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "shows")
+
 public class Show {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     @Column(name = "show_time", columnDefinition = "TIME", nullable = false)
     private LocalDateTime showTime;
 
@@ -48,6 +48,12 @@ public class Show {
     @UpdateTimestamp
     @Column(name = "updated_on")
     private Date updatedAt;
+
+    @Column(name = "recliner_seat_price")
+    private int reclinerSeatPrice;
+
+    @Column(name = "regular_seat_price")
+    private int regularSeatPrice;
 
     @ManyToOne
     @JsonIgnore
@@ -78,6 +84,8 @@ public class Show {
         return ShowDTO.builder()
                 .id(show.getId())
                 .showTime(show.getShowTime())
+                .reclinerSeatPrice(show.getReclinerSeatPrice())
+                .regularSeatPrice(show.getRegularSeatPrice())
                 .movieId(show.getMovie().getId())
                 .theaterId(show.getTheater().getId())
                 .seats(ShowSeat.toResource(show.getSeats()))
@@ -92,7 +100,8 @@ public class Show {
 
         return Show.builder()
                 .showTime(showResource.getShowTime())
+                .regularSeatPrice(showResource.getRegularSeatPrice())
+                .reclinerSeatPrice(showResource.getReclinerSeatPrice())
                 .build();
-
     }
 }

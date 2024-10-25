@@ -1,6 +1,7 @@
 package com.yash.MovieRoger.service;
 
 import com.yash.MovieRoger.dto.TheaterDTO;
+import com.yash.MovieRoger.dto.TheaterUpdateDTO;
 import com.yash.MovieRoger.enums.SeatType;
 import com.yash.MovieRoger.model.Theater;
 import com.yash.MovieRoger.model.TheaterSeats;
@@ -67,9 +68,36 @@ public class TheaterService {
 
         if(theater.isEmpty()) {
             log.error("Theater not found for id: {}", id);
-            throw new EntityNotFoundException("User not found with id: " + id);
+            throw new EntityNotFoundException("Theater not found with id: " + id);
         }
 
         return Theater.toResource(theater.get());
+    }
+
+    public List<Theater> getTheaterByCity(String city) {
+        Optional<List<Theater>> theater = theaterRepository.findByCity(city);
+        if(theater.isEmpty()) {
+            log.error("There is no theater with city: {}", city);
+            throw new EntityNotFoundException("There is no theater with city: " + city);
+        }
+        return theater.get();
+    }
+
+    public TheaterDTO editTheater(TheaterUpdateDTO theaterUpdateDTO) {
+        long id = theaterUpdateDTO.getId();
+        Optional<Theater> optionalTheater = theaterRepository.findById(id);
+        if(optionalTheater.isEmpty()) {
+            log.error("Theater not found for id: {}", id);
+            throw new EntityNotFoundException("Theater not found with id: " + id);
+        }
+        Theater theater = optionalTheater.get();
+        theater.getSeats().clear();
+        theater.getSeats().addAll(getTheaterSeats(theaterUpdateDTO.getRegularSeats(), theaterUpdateDTO.getReclinerSeats()));
+        theater.setReclinerSeat(theaterUpdateDTO.getReclinerSeats());
+        theater.setRegularSeat(theaterUpdateDTO.getRegularSeats());
+        for(TheaterSeats theaterSeatEntity: theater.getSeats()) {
+            theaterSeatEntity.setTheater(theater);
+        }
+        return Theater.toResource(theaterRepository.save(theater));
     }
 }

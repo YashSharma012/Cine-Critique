@@ -1,6 +1,7 @@
 package com.yash.MovieRoger.service;
 
 import com.yash.MovieRoger.dto.UserDTO;
+import com.yash.MovieRoger.exception.DuplicateFieldException;
 import com.yash.MovieRoger.model.User;
 import com.yash.MovieRoger.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,8 +25,17 @@ public class UserService {
     PasswordEncoder encoder;
 
     public UserDTO addUser(UserDTO userDTO) {
+        if(!userDTO.getMobile().matches("^\\+?[0-9]{10,15}$")){
+            throw new IllegalArgumentException("Invalid mobile number");
+        }
+        if(userRepository.existsByUsername(userDTO.getUsername())) {
+            throw new DuplicateFieldException("Username already exists");
+        }
         if (userRepository.existsByMobile(userDTO.getMobile())) {
-            return userDTO;
+            throw new DuplicateFieldException("Mobile number already exists");
+        }
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new DuplicateFieldException("Email already exists");
         }
 
         User user = User.toEntity(userDTO);
