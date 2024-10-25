@@ -2,6 +2,7 @@ package com.yash.MovieRoger.service;
 
 import com.yash.MovieRoger.dto.MovieDTO;
 import com.yash.MovieRoger.model.Movie;
+import com.yash.MovieRoger.repository.CacheRepository;
 import com.yash.MovieRoger.repository.MovieRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -20,6 +21,9 @@ public class MovieService {
     private static final Logger log = LoggerFactory.getLogger(MovieService.class);
     @Autowired
     MovieRepository movieRepository;
+
+    @Autowired
+    CacheRepository cacheRepository;
 
     public MovieDTO addMovie(MovieDTO movieDTO) {
         Movie movie = Movie.toEntity(movieDTO);
@@ -41,6 +45,12 @@ public class MovieService {
     }
 
     public MovieDTO getMovie(String title) {
+        Movie cachedMovie = cacheRepository.get(title.toLowerCase());
+        if(cachedMovie != null) {
+            MovieDTO resource = Movie.toResource(cachedMovie);
+            return resource;
+        }
+
         Movie movie = movieRepository.findByTitle(title);
         if(Objects.isNull(movie)) {
             throw new EntityNotFoundException("Movie not found:" + title);
@@ -50,6 +60,7 @@ public class MovieService {
         }
         movie.setSearchCount(movie.getSearchCount() + 1);
         movieRepository.save(movie);
+        cacheRepository.set(movie);
         return Movie.toResource(movie);
     }
 
