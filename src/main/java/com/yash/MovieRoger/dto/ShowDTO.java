@@ -1,14 +1,11 @@
 package com.yash.MovieRoger.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -20,9 +17,8 @@ public class ShowDTO {
     private long id;
 
     @NotNull(message = "Show Time is Mandatory")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern = "YYYY-MM-dd HH:mm")
     private LocalDateTime showTime;
 
     @NotNull(message = "Movie is mandatory for Show")
@@ -30,6 +26,12 @@ public class ShowDTO {
 
     @NotNull(message = "Theater is mandatory for Show")
     private long theaterId;
+
+    @NotNull(message = "Recliner seat price is mandatory")
+    private int reclinerSeatPrice;
+
+    @NotNull(message = "Regular seat price is mandatory for Show")
+    private int regularSeatPrice;
 
     private Date createdAt;
 

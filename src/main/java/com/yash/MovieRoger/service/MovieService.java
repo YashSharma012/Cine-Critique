@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,7 +45,20 @@ public class MovieService {
         if(Objects.isNull(movie)) {
             throw new EntityNotFoundException("Movie not found:" + title);
         }
-
+        if(movie.getSearchCount() == null){
+            movie.setSearchCount(0L);
+        }
+        movie.setSearchCount(movie.getSearchCount() + 1);
+        movieRepository.save(movie);
         return Movie.toResource(movie);
+    }
+
+    public List<MovieDTO> getTopMovies() {
+        List<MovieDTO> movieDTOList = new ArrayList<>();
+        List<Movie> movies = movieRepository.getTopMovies();
+        for (Movie movie : movies) {
+            movieDTOList.add(Movie.toResource(movie));
+        }
+        return movieDTOList;
     }
 }

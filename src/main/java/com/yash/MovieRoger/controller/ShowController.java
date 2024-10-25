@@ -23,11 +23,11 @@ public class ShowController {
         return new ResponseEntity<>(showService.createShow(showDTO), HttpStatus.CREATED);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<ShowDTO>> searchShow(
-            @RequestParam(name = "city",required = true) String city,
-            @RequestParam(name = "movieName", required = false) String movieName,
-            @RequestParam(name = "theaterName", required = false) String theaterName) {
-        return  ResponseEntity.ok(showService.searchShow(movieName, city, theaterName));
-    }
+//    @GetMapping("/search")
+//    public ResponseEntity<List<ShowDTO>> searchShow(
+//            @RequestParam(name = "city",required = true) String city,
+//            @RequestParam(name = "movieName", required = false) String movieName,
+//            @RequestParam(name = "theaterName", required = false) String theaterName) {
+//        return  ResponseEntity.ok(showService.searchShow(movieName, city, theaterName));
+//    }
 }

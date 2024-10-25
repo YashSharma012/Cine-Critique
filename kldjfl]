@@ -1,0 +1,23 @@
+[33mcommit eb98c98608439fa87936d0d3caa1c0811ea4383f[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Yash Sharma <113193859+YashSharma012@users.noreply.github.com>
+Date:   Sat Oct 12 21:02:17 2024 +0530
+
+    Update application.properties
+
+[33mcommit 3b068dfc70b6e43eadc2b1159bfea3f41757db52[m
+Author: Yash Sharma <113193859+YashSharma012@users.noreply.github.com>
+Date:   Wed Apr 3 22:44:08 2024 +0530
+
+    Create README.md
+
+[33mcommit 8aac139b48988edd17d09580c0a247b5e15d7526[m
+Author: yash <yash.sharma.cseaiml.2020@miet.ac.in>
+Date:   Wed Apr 3 22:19:29 2024 +0530
+
+    Modified SecurityConfig
+
+[33mcommit 955c67c8759eee7648d20b8b6cbc4fbdb1a6879b[m
+Author: yash <yash.sharma.cseaiml.2020@miet.ac.in>
+Date:   Fri Mar 22 21:05:55 2024 +0530
+
+    Added Project

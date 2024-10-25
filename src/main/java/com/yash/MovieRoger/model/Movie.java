@@ -28,6 +28,8 @@ public class Movie {
 
     private Double rating; //Average rating of all reviews
 
+    private Long searchCount;
+
     @OneToMany(mappedBy = "movie")
     private List<Review> reviewList;
 

@@ -2,6 +2,7 @@ package com.yash.MovieRoger.service;
 
 import com.yash.MovieRoger.dto.ShowDTO;
 import com.yash.MovieRoger.enums.SeatType;
+import com.yash.MovieRoger.exception.InvalidShowTimeException;
 import com.yash.MovieRoger.model.*;
 import com.yash.MovieRoger.repository.MovieRepository;
 import com.yash.MovieRoger.repository.ShowRepository;
@@ -14,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +41,9 @@ public class ShowService {
     TheaterRepository theaterRepository;
 
     public ShowDTO createShow(ShowDTO showDTO) {
+        if(isShowTimeInThePast(showDTO.getShowTime())){
+            throw new InvalidShowTimeException("Please enter a valid show time");
+        }
         Optional<Movie> movie = movieRepository.findById(showDTO.getMovieId());
         if(movie.isEmpty()) throw new EntityNotFoundException("Movie not found with ID:" + showDTO.getMovieId());
 
@@ -49,7 +56,7 @@ public class ShowService {
 
         show.setMovie(movie.get());
         show.setTheater(theater.get());
-        show.setSeats(generateShowSeats(show.getTheater().getSeats(), show));
+        show.setSeats(generateShowSeats(show.getTheater().getSeats(), show, showDTO.getRegularSeatPrice(), showDTO.getReclinerSeatPrice()));
 
         for (ShowSeat seatsEntity : show.getSeats()) {
             seatsEntity.setShow(show);
@@ -60,7 +67,7 @@ public class ShowService {
         return Show.toResource(show);
     }
 
-    private List<ShowSeat> generateShowSeats(List<TheaterSeats> theaterSeatEntity, Show show) {
+    private List<ShowSeat> generateShowSeats(List<TheaterSeats> theaterSeatEntity, Show show, int regularSeatPrice, int reclinerSeatPrice) {
         List<ShowSeat> showSeatEntity = new ArrayList<>();
 
         for(TheaterSeats theaterSeats : theaterSeatEntity) {
@@ -68,17 +75,17 @@ public class ShowService {
                     ShowSeat.builder()
                             .seatNumber(theaterSeats.getSeatNumber())
                             .seatType(theaterSeats.getSeatType())
-                            .rate(setSeatRate(theaterSeats.getSeatType()))
+                            .rate(setSeatRate(theaterSeats.getSeatType(), regularSeatPrice, reclinerSeatPrice))
                             .build();
             showSeatEntity.add(showSeat);
         }
         return showSeatRepository.saveAll(showSeatEntity);
     }
 
-    private int setSeatRate(SeatType seatType) {
+    private int setSeatRate(SeatType seatType, int regularSeatPrice, int reclinerSeatPrice) {
         return switch (seatType) {
-            case REGULAR -> 100;
-            case RECLINER -> 150;
+            case REGULAR -> regularSeatPrice;
+            case RECLINER -> reclinerSeatPrice;
         };
     }
 
@@ -97,5 +104,18 @@ public class ShowService {
             return new ArrayList<>();
         else
            return shows.stream().map(Show::toResource).collect(Collectors.toList());
+    }
+
+    public boolean isShowTimeInThePast(LocalDateTime showTime) {
+        return showTime.isBefore(LocalDateTime.now());
+    }
+
+    public List<ShowDTO> getShowByTheater(String theater) {
+        List<Show> shows = showRepository.getShowByTheater(theater);
+        List<ShowDTO> showDTOList = new ArrayList<>();
+        for(Show show : shows) {
+            showDTOList.add(Show.toResource(show));
+        }
+        return showDTOList;
     }
 }
