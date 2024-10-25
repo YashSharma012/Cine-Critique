@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class ShowService {
     TheaterRepository theaterRepository;
 
     public ShowDTO createShow(ShowDTO showDTO) {
+        //You have to add show before 24 hours of it's date and time
         if(isShowTimeInThePast(showDTO.getShowTime())){
             throw new InvalidShowTimeException("Please enter a valid show time");
         }
@@ -107,7 +109,7 @@ public class ShowService {
     }
 
     public boolean isShowTimeInThePast(LocalDateTime showTime) {
-        return showTime.isBefore(LocalDateTime.now());
+        return showTime.isBefore(LocalDateTime.now().plusDays(1));
     }
 
     public List<ShowDTO> getShowByTheater(String theater) {
